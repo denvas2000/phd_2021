@@ -13,7 +13,7 @@ public class CellCoor{
     
 public int user;
 public int movie;
-
+ 
 public CellCoor (int row, int col)
 {
     user=row;
