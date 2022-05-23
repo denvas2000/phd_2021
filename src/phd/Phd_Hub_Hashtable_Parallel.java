@@ -90,6 +90,9 @@ switch(choice) {
 
 }// Assign_Values
 
+/*
+Splits the Array into sections and assigns each section to a thread.
+*/
 public static void Thread_Similarities(
 int option,
 int totalUsers,
@@ -226,11 +229,11 @@ String outFileTiming = new String();
 
 datasetSelection=1;
 switch (datasetSelection) {
-    case 1: datasetFile="/home/denis/Documents/Datasets/01.Movielens_100k_old/ratings_Movielens_100K_OLD_Sorted_Pure.txt";
+    case 1: datasetFile="src/phd/Data/01.Movielens_100k_old/Movielens_100K_OLD_Sorted_Pure.txt";
             MAX_USERS= 945; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
-            userMovies = new HashMap(134999);    //Realsize/0.75 for good performance
+            userMovies = new HashMap<CellCoor,UserMovie>(134999);    //Realsize/0.75 for good performance
                                                    //HAS to BE a PRIME or odd.I use 134999.
             outFileResults="src/phd/Results/Results_Movielens_100K_Old_Hash_Parallel.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Movielens_100K_Old_Hash_Parallel.txt"; 
@@ -239,7 +242,7 @@ switch (datasetSelection) {
             MAX_USERS= 6045; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
-            userMovies = new HashMap(1335991);    //Realsize/0.75 for good performance
+            userMovies = new HashMap<CellCoor,UserMovie>(1335991);    //Realsize/0.75 for good performance
                                                     //HAS to BE a PRIME or odd.I use 1335991.
             outFileResults="src/phd/Results/Results_Movielens_1M_Old_Hash_Parallel.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Movielens_1M_Old_Hash_Parallel.txt"; 
@@ -249,13 +252,13 @@ switch (datasetSelection) {
             MAX_USERS= 8060; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
-            userMovies = new HashMap(210011);    //Realsize/0.75 for good performance
+            userMovies = new HashMap<CellCoor,UserMovie>(210011);    //Realsize/0.75 for good performance
                                                     //HAS to BE a PRIME or odd.I use 1335991.
             outFileResults="src/phd/Results/Results_Amazon_VG_Hash_Par.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Amazon_VG_Hash_Par.txt"; 
             //You have to set Heapsize to at least 4096MB (-Xms8000m) in order to increase speed
             break;
-    case 4: datasetFile="/home/denis/Documents/Datasets/01.Movielens_100k_old/ratings_Movielens_100K_OLD_Sorted.txt";break;
+    case 4: datasetFile="/home/denis/Documents/Datasets/01.Movielens_100k_old/ratings_Movielens_100K_OLD_Sorted.txt";break; 
 } //switch
 
 System.out.println("Variables initialization finished. Program execution started..." );
@@ -272,6 +275,7 @@ System.out.println("Data File reading started..." );
 firstTime=System.currentTimeMillis();
 startTime=System.currentTimeMillis();
 totals=Initialization.Data_Initialisation_General(datasetFile, users, userMovies, usersRatingSet, absMinTimeStamp, absMaxTimeStamp);
+//totals=Initialization.Data_Initialisation_100K_OLD(datasetFile, users, userMovies, usersRatingSet, absMinTimeStamp, absMaxTimeStamp);
 initTime=startTime-System.currentTimeMillis();  //Estimate Initialization Time
 System.out.println("Size after initialization:"+userMovies.size());
 
@@ -296,8 +300,10 @@ System.out.println("Data File reading finished..." );
         
 try(FileWriter outExcel = new FileWriter( outFileResults )) {
 
+    //System.out.println("All Fired UP1");
+        
     //Export File HEADINGS
-    
+
     outExcel.write("AA\tSimilarity"+"\tRevSimilarity"+"\tNO3RevSimilarity"+"\tMin Common Movies"+"\tFirst Best Neighs");
     outExcel.write("\tNN Predictions"+"\tNN Coverage"+"\tNN MAE Sum"+"\tNN MAE CF");
     outExcel.write("\tFN Predictions"+"\tFN Coverage"+"\tFN MAE Sum"+"\tFN MAE CF");
@@ -311,16 +317,21 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
     try(FileWriter out = new FileWriter( outFileTiming ))            //Open file for writing
     {
 
+        
+        //System.out.println("All Fired UP2");
         //All parameters used fot the simulation process
         
         //for (q=MIN_MOST_RECENT_RATINGS;q<=MIN_MOST_RECENT_RATINGS;q+=10)
-        for (p=DOWN_BEST_NEIGH;p<=UPPER_BEST_NEIGH;p+=10)
-        for (n=MIN_COMMON_MOVIES;n<=MAX_COMMON_MOVIES;n+=10)
+        for (p=DOWN_BEST_NEIGH;p<=UPPER_BEST_NEIGH;p+=10) {
+            //System.out.println("All Fired UP3");
+        for (n=MIN_COMMON_MOVIES;n<=MAX_COMMON_MOVIES;n+=10) {
+           // System.out.println("All Fired UP4");
  //       for (o=MIN_SIMILAR_NEIGH;o<=MAX_SIMILAR_NEIGH;o+=10)  //OBSOLETE - NOT USED ANY MORE
-        for (l=SIMILARITY_BASE_LIMIT;l<=SIMILARITY_UPPER_LIMIT;l+=20)
-        for (m=NEGATIVE_SIMILARITY_BASE_LIMIT;m<=NEGATIVE_SIMILARITY_UPPER_LIMIT;m+=20)    
+        for (l=SIMILARITY_BASE_LIMIT;l<=SIMILARITY_UPPER_LIMIT;l+=20){
+            //System.out.println("All Fired UP5");
+        for (m=NEGATIVE_SIMILARITY_UPPER_LIMIT;m>=NEGATIVE_SIMILARITY_BASE_LIMIT;m-=20)    
         {            
-            
+            System.out.println("All Fired UP6");
             //Compute SIMILARITIES
             
             
@@ -338,15 +349,15 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
             //Similarities.Positive_Similarity(totalUsers, totalMovies, US = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)l/100, n); 
             simTime1=startTime-System.currentTimeMillis();
             startTime=System.currentTimeMillis();           //Set new timer
-            Thread_Similarities(2, totalUsers, RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 0, (double)-m/100,n);
+            Thread_Similarities(2, totalUsers, RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 0, (double)m/100,n);
             //Similarities.Compute_Similarity(totalUsers, totalMovies, RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 0, (double)-m/100, n);
             simTime2=startTime-System.currentTimeMillis();
             startTime=System.currentTimeMillis();           //Set new timer
-            Thread_Similarities(2, totalUsers, NO3RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 2, (double)-m/100,n);
+            Thread_Similarities(2, totalUsers, NO3RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 2, (double)m/100,n);
             //Similarities.Compute_Similarity(totalUsers, totalMovies, NO3RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 2, (double)-m/100, n);
             simTime3=startTime-System.currentTimeMillis();
             startTime=System.currentTimeMillis();           //Set new timer
-            Thread_Similarities(3, totalUsers, INVUS = new List[MAX_USERS], users, userMovies, usersRatingSet, -1, (double)m/100,n);
+            Thread_Similarities(3, totalUsers, INVUS = new List[MAX_USERS], users, userMovies, usersRatingSet, -1, (double)-m/100,n);
             //Similarities.Inverted_Similarity(totalUsers, totalMovies, INVUS = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)m/100, n);
             simTime4=startTime-System.currentTimeMillis();
             //System.out.println("aaa");
@@ -407,7 +418,7 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
         //Testing the process so far 
             aa++;    
 
-            outExcel.write(aa+"\t"+(double)l/100+"\t"+(double)-m/100+"\t"+(double)-m/100+"\t"+n+"\t"+p);
+            outExcel.write(aa+"\t"+(double)l/100+"\t\t"+(double)m/100+"\t"+(double)m/100+"\t"+n+"\t"+p);
             outExcel.write("\t"+positivePredictions+"\t"+(double)positivePredictions/(totalUsers+1)+"\t"+MAE+"\t"+(double)(MAE/positivePredictions));
             outExcel.write("\t"+revPredictedValues+"\t"+(double)revPredictedValues/(totalUsers+1)+"\t"+RevMAE+"\t"+(double)(RevMAE/revPredictedValues));
             outExcel.write("\t"+NO3RevPredictedValues+"\t"+(double)NO3RevPredictedValues/(totalUsers+1)+"\t"+NO3RevMAE+"\t"+(double)(NO3RevMAE/NO3RevPredictedValues));
@@ -450,6 +461,10 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
             out.write("********************************************************\r\n");            
             out.write("\r\n");
         }    
+        
+        } //l
+        } //n 
+        } //p
             out.close();     //Close output file
             
         } //try    //try   

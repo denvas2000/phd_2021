@@ -75,7 +75,7 @@ static final int MAX_MOVIES=27000;       //Maximum Movies the program can handle
 static final int TOTAL_RATINGS=100000;
 
 static User[] users;                                              //Store User Details (see class declaration)
-static HashMap<CellCoor,UserMovie> userMovies;                  //Store User Ratings
+static HashMap<CellCoor,UserMovie> userMovies;                    //Store User Ratings
 static HashSet<Integer>[] usersRatingSet;                         //Array Set containg for each user the Movies that has rated
 
 
@@ -102,7 +102,7 @@ else
    
 }
 
-}// Methid Print_to_File
+}// Method Print_to_File
 
 public static void main(String[] args) {
 
@@ -117,9 +117,9 @@ UserSimilarity[][] User_Similarities = new UserSimilarity [MAX_USERS][MAX_USERS]
 double Similarity=0, KF_NO3_Similarity=0, MaxSimValue=0, MinSimValue=0;
         
 List<UserSimilarity> UserList = new ArrayList<>();
-List<UserSimilarity>[] US;    //Array of list holding for each user the NN
-List<UserSimilarity>[] RUS;   //Array of list holding for each user the FN
-List<UserSimilarity>[] NO3RUS;    //Array of list holding for each user the FN
+List<UserSimilarity>[] US;      //Array of list holding for each user the NN
+List<UserSimilarity>[] RUS;     //Array of list holding for each user the FN
+List<UserSimilarity>[] NO3RUS;  //Array of list holding for each user the FN Rejecting Ratings 3.
 List<UserSimilarity>[] INVUS;  
 List<UserSimilarity>[] COMBINE;  
 
@@ -163,11 +163,11 @@ String outFileTiming = new String();
 
 datasetSelection=1;
 switch (datasetSelection) {
-    case 1: datasetFile="/home/denis/Documents/Datasets/01.Movielens_100k_old/ratings_Movielens_100K_OLD_Sorted_Pure.txt";
+    case 1: datasetFile="src/phd/Data/01.Movielens_100k_old/Movielens_100K_OLD_Sorted_Pure.txt";
             MAX_USERS= 945; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
-            userMovies = new HashMap(134999);    //Realsize/0.75 for good performance
+            userMovies = new HashMap<CellCoor,UserMovie>(134999);    //Realsize/0.75 for good performance
                                                    //HAS to BE a PRIME or odd.I use 134999.
             outFileResults="src/phd/Results/Results_Movielens_100K_Old_Hash.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Movielens_100K_Old_Hash.txt"; 
@@ -176,7 +176,7 @@ switch (datasetSelection) {
             MAX_USERS= 6045; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
-            userMovies = new HashMap(1335991);    //Realsize/0.75 for good performance
+            userMovies = new HashMap<CellCoor,UserMovie>(1335991);    //Realsize/0.75 for good performance
                                                     //HAS to BE a PRIME or odd.I use 1335991.
             outFileResults="src/phd/Results/Results_Movielens_1M_Old_Hash.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Movielens_1M_Old_Hash.txt"; 
@@ -186,7 +186,7 @@ switch (datasetSelection) {
             MAX_USERS= 8060; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
-            userMovies = new HashMap(210011);    //Realsize/0.75 for good performance
+            userMovies = new HashMap<CellCoor,UserMovie>(210011);    //Realsize/0.75 for good performance
                                                     //HAS to BE a PRIME or odd.I use 1335991.
             outFileResults="src/phd/Results/Results_Amazon_VG_Hash_Hub.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Amazon_VG_Hash_Hub.txt"; 
@@ -196,7 +196,7 @@ switch (datasetSelection) {
             MAX_USERS= 294800; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
-            userMovies = new HashMap(8681003);    //Realsize/0.75 for good performance
+            userMovies = new HashMap<CellCoor,UserMovie>(8681003);    //Realsize/0.75 for good performance
                                                     //HAS to BE a PRIME or odd.I use 1335991.
             outFileResults="src/phd/Results/Results_Amazon_Book_Hash_Hub.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Amazon_Book_Hash_Hub.txt"; 
@@ -267,7 +267,7 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
         for (n=MIN_COMMON_MOVIES;n<=MAX_COMMON_MOVIES;n+=10)
  //       for (o=MIN_SIMILAR_NEIGH;o<=MAX_SIMILAR_NEIGH;o+=10)  //OBSOLETE - NOT USED ANY MORE
         for (l=SIMILARITY_BASE_LIMIT;l<=SIMILARITY_UPPER_LIMIT;l+=20)
-        for (m=NEGATIVE_SIMILARITY_BASE_LIMIT;m<=NEGATIVE_SIMILARITY_UPPER_LIMIT;m+=20)    
+        for (m=NEGATIVE_SIMILARITY_UPPER_LIMIT;m<=NEGATIVE_SIMILARITY_BASE_LIMIT;m-=20)    
         {            
             
             //Compute SIMILARITIES

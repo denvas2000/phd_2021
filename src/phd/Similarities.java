@@ -99,7 +99,7 @@ return mergeSet;
 /**
  * 
  * Compute_Positive-Similarity: Method to compute ONLY POSITIVE similarities among all neighbors. 
- * Accepts as imput the following variables
+ * Accepts as input the following variables
  * 
  * @param totalUsers
  * @param totalMovies

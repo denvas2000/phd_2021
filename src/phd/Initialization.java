@@ -525,11 +525,11 @@ try {   //Read Files. Initiate tables
 
             e.printStackTrace();
 
-	} //catch file error
+} //catch file error
 
-        int[] mainStats={totalUsers, totalMovies};
-        
-        return mainStats;
+int[] mainStats={totalUsers, totalMovies};
+System.out.println("BBB");        
+return mainStats;
         
 } //Data_Initialisation_100K_OLD
 
@@ -708,6 +708,7 @@ try {   //Read Files. Initiate tables
 
 public static int[] Data_Initialisation_General(
 String dataFile, 
+//int[] rates,        
 User[] users, 
 HashMap<CellCoor,UserMovie>  userMovies,
 HashSet<Integer>[] usersRatingSet, 
@@ -774,7 +775,7 @@ try {   //Read Files. Initiate tables
             // Read the numbers in line, store them in Nums_Line, max numbers 4 (or the rest are ignored)
             while((Scan_Line.hasNext()) && (Nums_Per_Line_Count<4)) 
             {
-                            //System.out.println("AAA");
+                //System.out.println("AAA");
                 Nums_Line[Nums_Per_Line_Count++]=Scan_Line.nextInt();
                 //System.out.println("BBB");
             }

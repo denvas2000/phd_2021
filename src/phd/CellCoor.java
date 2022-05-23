@@ -37,7 +37,7 @@ return user==cell.user && movie==cell.movie;
 
 }
 
-//As seen at Josh Bloch's Effecrive Java (Item 8) 2nd Ed.
+//As seen at Josh Bloch's Effective Java (Item 8) 2nd Ed.
 @Override
 public int hashCode() {
     int hash = 7;

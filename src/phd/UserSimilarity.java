@@ -16,8 +16,10 @@ public class UserSimilarity implements Comparable<UserSimilarity>{
     
 public int FUser_Id;
 public int SUser_Id;
-public Double Similarity;           //It has to be Double (object) so as to settle compareTo method
-public double combinedSimilarity;
+public Double Similarity;               //Similarity (positive/negative) of the two users
+                                        //It has to be Double (object) so as to settle compareTo method
+public double combinedSimilarity;       //Similarity (abs measure) of the two users
+                                        //DOES IT NEED TO BE Double?
 public int flag;
 
 
