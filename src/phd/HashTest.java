@@ -67,7 +67,7 @@ public class HashTest {
         hmuser1.put(2,new User(600,200,200));
         hmuser2.put(1,hmuser1);
 
-        hmuser1= new HashMap(); //CRUCIAL
+        hmuser1= new HashMap<Integer,User>(); //CRUCIAL
         
         hmuser1.put(3,new User(500,200,200));
         hmuser1.put(4,new User(800,200,200));
@@ -83,7 +83,7 @@ public class HashTest {
          
         Map.Entry me = (Map.Entry)j.next();
         System.out.println("a "+me.getKey() + ": ");
-        hmuser1=(HashMap)me.getValue();
+        hmuser1=(HashMap<Integer,User>)me.getValue();
         
         userset = hmuser1.entrySet();
         i=userset.iterator();
@@ -100,7 +100,7 @@ public class HashTest {
         
         //COMPOSITE HASH MAP WITH ARRAY
         
-        hmuser1= new HashMap(); //CRUCIAL
+        hmuser1= new HashMap<Integer,User>(); //CRUCIAL
         
         hmuser1.put(3,new User(1500,200,200));
         hmuser1.put(4,new User(1800,200,200));

@@ -246,99 +246,130 @@ return new double[] {simNeighbors, predictedValues, MAE};
 /*  *****
     Combined_Prediction: Combines both Positive and Negative Similarities, to make a prediction.
     ASSUMPTION: All input Lists, are ready for use. They contain just the data they have to.
+
+    posSim and negSim are lists having all similarity information needed. The 2 lists are going to be combined into a new list that
+    merges the other two, providing a new, more sofisticated, similarity list
     *****
+    totalUsers  -- total users in sample
+    totalMovies -- total movies in sample
+    posSim      -- Ordinary similarity list
+    negSim      -- Similarity list based on Furthest neighbors
+    comSim      -- New COMBINED Similarity list based on previous two similarity lists, which are MERGED and sorted in DESCENDING ORDER
+User[] Users,
+HashMap<CellCoor,UserMovie>  userMovies,
+int bestNeigh)          
+
 */
     
 public static double[] Combined_Prediction (
-int totalUsers, 
-int totalMovies,
-List<UserSimilarity>[] posSim,
-List<UserSimilarity>[] negSim,
-List<UserSimilarity>[] comSim,
+int totalUsers,                                     //Users in the sample Data
+int totalMovies,                                    //Movies in the sample Data
+List<UserSimilarity>[] posSim,                      //Similarity list of a user
+List<UserSimilarity>[] negSim,                      //FN Similarity list of a user
+List<UserSimilarity>[] comSim,                      //COMBINED Similarity list of a user. May contain DUPLICATES
 User[] Users,
 HashMap<CellCoor,UserMovie>  userMovies,
-int bestNeigh)              //Select just the "bestNeigh" (absolute number of most similar heighbors)
+int bestNeigh)                                      //Select just the "bestNeigh" (absolute number of most similar heighbors)
 
 {
 
 int i, k, l;    
 int combinedNeighbors=0;
-List<UserSimilarity>[] combinedSim = new List[Phd_Hub_Hashtable.MAX_USERS];    //Array of list holding for each user the FN
-List<UserSimilarity> posList = new ArrayList<>();
-List<UserSimilarity> negList = new ArrayList<>();
-List<UserSimilarity> combinedList;
+List<UserSimilarity>[] combinedSim = new List[Phd_Hub_Hashtable_Parallel.MAX_USERS];    //Array of list holding for each user the FN
+
+List<UserSimilarity> posList = new ArrayList<>();   //Similarity list of a user
+List<UserSimilarity> negList = new ArrayList<>();   //FN Similarity list of a user
+List<UserSimilarity> combinedList;                  //COMBINED Similarity list of a user. May contain DUPLICATES
+HashSet<Integer> usersSet = new HashSet<>();        //Set containg the ID (only) of similar users of a specific user. NO DUPLICATES
+                                                    //Helps creating comSim and combinedList
+
 double Numerator_Pred, Denominator_Pred;            //Numerator and Denominator of Prediction function.
 int predictedValues=0;                              //The total number of actually predicted values
 double combinedMAE=0.0;                             //Mean Absolute Error of Prediction.
-double sim;                                         //Similarity value of a current record
-HashSet<Integer> usersSet = new HashSet<>();        //Set containg the ID of similar users of a specific user
-HashSet<Integer> userRatingSet = new HashSet<>();   //Set containg for a specific user the Movies that has rated
+//double sim;                                         //Similarity value of a current record
+
+//HashSet<Integer> userRatingSet = new HashSet<>();   //Set containg for a specific user the Movies that has rated
 Integer curUser;                                    //User under manipulation
 Iterator<UserSimilarity> itr;
 UserSimilarity tempSim =new UserSimilarity();
 int temp=0, pos=0, neg=0;
 int minSimNeigh=0;
 CellCoor cell = new CellCoor();
-CellCoor cell1 = new CellCoor();
+//CellCoor cell1 = new CellCoor();
+
+
+//Checking all users
 
 for (i=0;i<=totalUsers;i++) 
 {
 
+    //Get similarity lists of a user
     posList=posSim[i];
     negList=negSim[i];
+    
+    //Create Combined similarity list. The TWO previous lists are MERGED. They may contain DUPLICATES
     combinedList= new ArrayList<>(posList);
     combinedList.addAll(negList);
     
-    //Sort array in DESCending order (=maximum similarity first)
-    //Collections.sort(combinedList, Collections.reverseOrder());
+    //Sort array in DESCending order (=>maximum similarity first)
+    //Collections.sort(combinedList, Collections.reverseOrder());   --DELETE??
     combinedList.sort(Comparator.comparingDouble(UserSimilarity::GetCombinedSimilarity).reversed());
+    
+    //DELETE ??
     comSim[i]= new ArrayList<>();
     
     //Keep each user ONCE. EITHER ITS POSTTIVE OR ITS NEGATIVE RATING
    //System.out.print(i+" :");
-    itr=combinedList.iterator();
+    itr=combinedList.iterator();  //Go to START of list
+    
+    //If there are similar neighbours then proceed
     if (combinedList.size()>0) 
     {   
         //temp++; //Δίνει 936
-        usersSet.clear();
-        /*if (usersSet.isEmpty()) 
+        usersSet.clear();         //Create new similar users SET with NO DUPLICATES
+        /*if (usersSet.isEmpty())                   //DELETE IF??
             System.out.println(" Set is Empty ");
         else
             System.out.print(" Problem");*/
-        while (itr.hasNext())
+        while (itr.hasNext())     //Scan all similar users
         {
 
-            tempSim = new UserSimilarity();
+            //Get next similar user
+            tempSim = new UserSimilarity(); 
             tempSim = itr.next();
             curUser=tempSim.SUser_Id;
             //System.out.print(" "+curUser);
-            if (usersSet.contains(curUser)) { //System.out.println(" Remove* "+curUser+" * ");
+            
+            //If user has already been included then remove from initial list, otherwise add the user
+            if (usersSet.contains(curUser)) { //System.out.println(" Remove* "+curUser+" * "); 
                 itr.remove();}
             else{//System.out.println(" Add* "+curUser+" * ");
                 usersSet.add(curUser);}
                         
-        }
+        } //while (itr.hasNext())
 
-    }
+    } //if (combinedList.size()>0) 
     comSim[i].addAll(combinedList);
 
     //System.out.println();            
     
     //if (combinedList.size()>0) temp++; //Δινει 126
     
+    //Calculate Combined Similarity. Compare LAST MOVIE rating with Combined Prediction
+    
     Numerator_Pred=0;Denominator_Pred=0;
-    k=Users[i].lastMovieId;
+    k=Users[i].lastMovieId;            
             
-    //if (!UserList.isEmpty()) 
-    if (combinedList.size()>minSimNeigh) 
+    if (combinedList.size()>minSimNeigh) //Does the User have at least the minimum number Neighbours?
     {   
         if (bestNeigh<combinedList.size())                      //Select just the "bestNeigh" best neighbors. If total neighbors less than
             combinedList=combinedList.subList(0, bestNeigh-1);  //n=bestNeigh then select them all.
 
-        combinedNeighbors++;                                    
+        combinedNeighbors++;                                    //Users with Combined Similar neighbours         
         
+        //Scan all combined neighbours to make prediction
         
-        for (UserSimilarity io: combinedList)
+        for (UserSimilarity io: combinedList)           
         {
                    
             cell.user=io.SUser_Id;cell.movie=k;
@@ -441,7 +472,7 @@ for (i=0;i<=totalUsers;i++)
             //System.out.println(i+" "+MAE);
             predictedValues++;
     }
-            
+       
     UserList=new ArrayList<>();
     
 }    

@@ -141,7 +141,7 @@ else
 
 // HASHTABLE TEST2
 
-Hashtable<String,String> hashtest = new Hashtable();
+Hashtable<String,String> hashtest = new Hashtable<String,String>();
 
 hashtest.put("A","A1");
 hashtest.put("A","A2");
@@ -176,7 +176,7 @@ else
 // HASHTABLE TEST3
 System.out.println("\nnew test\n");
 
-Hashtable<CellCoor,String> hashtest2 = new Hashtable();
+Hashtable<CellCoor,String> hashtest2 = new Hashtable<CellCoor,String>();
 CellCoor cell = new CellCoor(1,1);
 
 hashtest2.put(cell,"A1");

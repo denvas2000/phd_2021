@@ -48,17 +48,16 @@ package phd;
  * and open the template in the editor.
  */
  
-//import UserMovie;
-import java.io.BufferedReader;
-import java.io.FileReader;
+//import java.io.BufferedReader;
+//import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
+//import java.util.Scanner;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.Hashtable;
+//import java.util.Hashtable;
 import java.util.HashMap;
 
 
@@ -73,9 +72,9 @@ static int MAX_USERS;              //Maximum Users the program can handle
 static int MAX_MOVIES;       //Maximum Movies the program can handle
 //static final int TOTAL_RATINGS=100000;
 
-static User[] users;                                              //Store User Details (see class declaration)
+static User[] users;                                            //Store User Details (see class declaration)
 static HashMap<CellCoor,UserMovie> userMovies;                  //Store User Ratings
-static HashSet<Integer>[] usersRatingSet;                         //Array Set containg for each user the Movies that has rated
+static HashSet<Integer>[] usersRatingSet;                       //Array Set containg for each user the Movies that has rated
 
 
 public static void Assign_Values(double[] values, int choice) {
@@ -128,9 +127,6 @@ for (i=0;i<=THREADS-1;i++)
     PS[i]= new Parallel_Sim(option,lowbound, upperbound, totalUsers, userSim, users, userMovies, usersRatingSet, similaritySign, simBase,commonMovies);
     threadPool[i]= new Thread(PS[i],"t"+String.valueOf(i));
 }
-
-//usersRatingSet = new HashSet[MAX_USERS];
-//userMovies = new Hashtable(134999); 
 
 //  Start all threads
 for (i=0;i<=THREADS-1;i++)
@@ -227,9 +223,9 @@ String outFileTiming = new String();
 // Initialize Main Variables
 //
 
-datasetSelection=1;
+datasetSelection=2;
 switch (datasetSelection) {
-    case 1: datasetFile="src/phd/Data/01.Movielens_100k_old/Movielens_100K_OLD_Sorted_Pure.txt";
+    case 1: datasetFile="src/phd/Data/Movielens_100K_OLD_Sorted_Pure.txt";
             MAX_USERS= 945; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
@@ -238,12 +234,12 @@ switch (datasetSelection) {
             outFileResults="src/phd/Results/Results_Movielens_100K_Old_Hash_Parallel.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Movielens_100K_Old_Hash_Parallel.txt"; 
             break;
-    case 2: datasetFile="/home/denis/Documents/Datasets/02.Movielens_1M_Old/ratings_MovieLens_1M_Old.txt";
+    case 2: datasetFile="src/phd/Data/MovieLens_1M_Old.txt";
             MAX_USERS= 6045; 
             users = new User[MAX_USERS];
             usersRatingSet = new HashSet[MAX_USERS];
             userMovies = new HashMap<CellCoor,UserMovie>(1335991);    //Realsize/0.75 for good performance
-                                                    //HAS to BE a PRIME or odd.I use 1335991.
+                                                                      //HAS to BE a PRIME or odd.I use 1335991.
             outFileResults="src/phd/Results/Results_Movielens_1M_Old_Hash_Parallel.txt"; 
             outFileTiming ="src/phd/Timings/Timing_Movielens_1M_Old_Hash_Parallel.txt"; 
             //You have to set Heapsize to at least 4096MB (-Xms4096m)
@@ -346,24 +342,24 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
             US = new List[MAX_USERS];
             startTime=System.currentTimeMillis();           //Set new timer
             Thread_Similarities(1, totalUsers, US, users, userMovies, usersRatingSet, -1, (double)l/100,n);
-            //Similarities.Positive_Similarity(totalUsers, totalMovies, US = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)l/100, n); 
             simTime1=startTime-System.currentTimeMillis();
             startTime=System.currentTimeMillis();           //Set new timer
+            
             Thread_Similarities(2, totalUsers, RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 0, (double)m/100,n);
-            //Similarities.Compute_Similarity(totalUsers, totalMovies, RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 0, (double)-m/100, n);
             simTime2=startTime-System.currentTimeMillis();
+
             startTime=System.currentTimeMillis();           //Set new timer
             Thread_Similarities(2, totalUsers, NO3RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 2, (double)m/100,n);
-            //Similarities.Compute_Similarity(totalUsers, totalMovies, NO3RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 2, (double)-m/100, n);
             simTime3=startTime-System.currentTimeMillis();
+
             startTime=System.currentTimeMillis();           //Set new timer
             Thread_Similarities(3, totalUsers, INVUS = new List[MAX_USERS], users, userMovies, usersRatingSet, -1, (double)-m/100,n);
-            //Similarities.Inverted_Similarity(totalUsers, totalMovies, INVUS = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)m/100, n);
             simTime4=startTime-System.currentTimeMillis();
             //System.out.println("aaa");
             //Similarities.Print_Similarities(totalUsers, US);
 
-            //For each User there is a sorted array with all its NN/FN calculated
+            //For each User there is a sorted array with all its NN/FN calculated. 
+            //The sorting is in descending order -- RUS, NO3RUS have negative values 
             startTime=System.currentTimeMillis();           //Set new timer
             for (i=0;i<=totalUsers;i++)
             {
@@ -418,8 +414,8 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
         //Testing the process so far 
             aa++;    
 
-            outExcel.write(aa+"\t"+(double)l/100+"\t\t"+(double)m/100+"\t"+(double)m/100+"\t"+n+"\t"+p);
-            outExcel.write("\t"+positivePredictions+"\t"+(double)positivePredictions/(totalUsers+1)+"\t"+MAE+"\t"+(double)(MAE/positivePredictions));
+            outExcel.write(aa+"\t"+(double)l/100+"\t\t"+(double)m/100+"\t\t"+(double)m/100+"\t\t\t"+n+"\t\t\t"+p);
+            outExcel.write("\t\t"+positivePredictions+"\t"+(double)positivePredictions/(totalUsers+1)+"\t"+MAE+"\t"+(double)(MAE/positivePredictions));
             outExcel.write("\t"+revPredictedValues+"\t"+(double)revPredictedValues/(totalUsers+1)+"\t"+RevMAE+"\t"+(double)(RevMAE/revPredictedValues));
             outExcel.write("\t"+NO3RevPredictedValues+"\t"+(double)NO3RevPredictedValues/(totalUsers+1)+"\t"+NO3RevMAE+"\t"+(double)(NO3RevMAE/NO3RevPredictedValues));
             outExcel.write("\t"+negAverPredictedValues+"\t"+(double)negAverPredictedValues/(totalUsers+1)+"\t"+negAverMAE+"\t"+(double)(negAverMAE/negAverPredictedValues));            

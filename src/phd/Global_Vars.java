@@ -77,6 +77,6 @@ static int combinedPredictions, combinedNeighbors;static double MAE=0.0, RevMAE=
 static double TotalMAE=0.0, NO3TotalMAE=0.0, combinedMAE=0.0, negAverMAE;              //Mean Absolute Error of Combined Prediction.
 static int absMinTimeStamp=Integer.MAX_VALUE, absMaxTimeStamp=Integer.MIN_VALUE;
 
-static int THREADS=4;
+static int THREADS=10;
 
 }

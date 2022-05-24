@@ -23,6 +23,13 @@ import phd.Global_Vars;
  */
 public class Initialization {
 
+    
+/*
+New_Rating
+    
+Inverts the ratings. If the (abs)difference is more than 0.5 special treatment is applied
+    
+*/    
 public static int New_Rating (int tempRating, double diff) {
 int newRating;
 
@@ -112,7 +119,7 @@ int tempRating;
 int tempInvRating;
 int[] tempSum = new int[totalUsers+1];
 double[] tempAverage = new double[totalUsers+1];      
-double diff;
+double diff;        //Deviation from mean value (3)
 int user,movie;
 UserMovie tempUserMovie;
 Set<CellCoor> keys;
@@ -159,6 +166,7 @@ System.out.println(i+" "+tempSum[i]+" "+i1);
 } //for i 
 */
 } //END of class Compute_Inverse
+
 
 
 /* ***********************
