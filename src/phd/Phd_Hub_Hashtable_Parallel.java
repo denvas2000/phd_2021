@@ -81,8 +81,8 @@ public static void Assign_Values(double[] values, int choice) {
 
 switch(choice) {
        case 1: simNeighbors=(int)values[0]; positivePredictions=(int)values[1];MAE=values[2];break;
-       case 2: revSimNeighbors=(int)values[1];revPredictedValues=(int)values[4];RevMAE=values[7];break;
-       case 3: NO3RevSimNeighbors=(int)values[2];NO3RevPredictedValues=(int)values[5]; NO3RevMAE=values[8];break;
+       case 2: revSimNeighbors=(int)values[0];revPredictedValues=(int)values[1];RevMAE=values[2];break;
+       case 3: NO3RevSimNeighbors=(int)values[0];NO3RevPredictedValues=(int)values[1]; NO3RevMAE=values[2];break;
        case 4: negAverSimNeighbors=(int)values[0];negAverPredictedValues=(int)values[1]; negAverMAE=values[2];break;       
        case 5: combinedNeighbors=(int)values[0]; combinedPredictions=(int)values[1];combinedMAE=values[2];break;
 } //switch 
@@ -99,7 +99,6 @@ List<UserSimilarity>[] userSim,
 User[] users,
 HashMap<CellCoor,UserMovie> userMovies,
 HashSet<Integer>[] usersRatingSet,
-int similaritySign,
 double simBase,
 int commonMovies)
 {
@@ -124,7 +123,7 @@ System.out.println("Synchr:"+Long.toString(firstTime-System.currentTimeMillis())
 for (i=0;i<=THREADS-1;i++)
 {
     lowbound=upperbound+1;upperbound=(int)((i+1)*totalUsers/THREADS);
-    PS[i]= new Parallel_Sim(option,lowbound, upperbound, totalUsers, userSim, users, userMovies, usersRatingSet, similaritySign, simBase,commonMovies);
+    PS[i]= new Parallel_Sim(option,lowbound, upperbound, totalUsers, userSim, users, userMovies, usersRatingSet, simBase, commonMovies);
     threadPool[i]= new Thread(PS[i],"t"+String.valueOf(i));
 }
 
@@ -223,7 +222,7 @@ String outFileTiming = new String();
 // Initialize Main Variables
 //
 
-datasetSelection=2;
+datasetSelection=1;
 switch (datasetSelection) {
     case 1: datasetFile="src/phd/Data/Movielens_100K_OLD_Sorted_Pure.txt";
             MAX_USERS= 945; 
@@ -301,11 +300,11 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
     //Export File HEADINGS
 
     outExcel.write("AA\tSimilarity"+"\tRevSimilarity"+"\tNO3RevSimilarity"+"\tMin Common Movies"+"\tFirst Best Neighs");
-    outExcel.write("\tNN Predictions"+"\tNN Coverage"+"\tNN MAE Sum"+"\tNN MAE CF");
-    outExcel.write("\tFN Predictions"+"\tFN Coverage"+"\tFN MAE Sum"+"\tFN MAE CF");
-    outExcel.write("\tNO3 FN Predictions"+"\tNO3 FN Coverage"+"\tNO3 FN MAE Sum"+"\tNO3 Rev MAE CF");
-    outExcel.write("\tDenFN Predictions"+"\tDenFN Coverage"+"\tDenFN MAE Sum"+"\tDenRev MAE CF");    
-    outExcel.write("\tCombined NN FN Predictions"+"\tNN FN Coverage"+"\tNN FN MAE Sum"+"\tNN FN MAE CF");
+    outExcel.write("\tNN Predictions"+"\t\tNN Coverage"+"\t\tNN MAE Sum"+"\tNN MAE CF");
+    outExcel.write("\t\tFN Predictions"+"\tFN Coverage"+"\t\tFN MAE Sum"+"\tFN MAE CF");
+    outExcel.write("\t\tNO3 FN Predictions"+"\tNO3 FN Coverage"+"\t\tNO3 FN MAE Sum"+"\tNO3 Rev MAE CF");
+    outExcel.write("\t\tDenFN Predictions"+"\tDenFN Coverage"+"\t\tDenFN MAE Sum"+"\tDenRev MAE CF");    
+    outExcel.write("\t\tCombined NN FN Predictions"+"\tNN FN Coverage"+"\t\tNN FN MAE Sum"+"\tNN FN MAE CF");
     outExcel.write("\r\n");  
     
     //Print_to_File(outExcel,1);            
@@ -339,21 +338,21 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
 
             TotalPredictedValues=0;NO3TotalPredictedValues=0;            
             NO3TotalMAE=0.0;TotalMAE=0.0;                                    
-            US = new List[MAX_USERS];
+//            US = new List[MAX_USERS];
             startTime=System.currentTimeMillis();           //Set new timer
-            Thread_Similarities(1, totalUsers, US, users, userMovies, usersRatingSet, -1, (double)l/100,n);
+            Thread_Similarities(1, totalUsers, US     = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)l/100,n);
             simTime1=startTime-System.currentTimeMillis();
             startTime=System.currentTimeMillis();           //Set new timer
             
-            Thread_Similarities(2, totalUsers, RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 0, (double)m/100,n);
+            Thread_Similarities(2, totalUsers, RUS    = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)m/100,n);
             simTime2=startTime-System.currentTimeMillis();
-
+             
             startTime=System.currentTimeMillis();           //Set new timer
-            Thread_Similarities(2, totalUsers, NO3RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, 2, (double)m/100,n);
+            Thread_Similarities(3, totalUsers, NO3RUS = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)m/100,n);
             simTime3=startTime-System.currentTimeMillis();
 
             startTime=System.currentTimeMillis();           //Set new timer
-            Thread_Similarities(3, totalUsers, INVUS = new List[MAX_USERS], users, userMovies, usersRatingSet, -1, (double)-m/100,n);
+            Thread_Similarities(4, totalUsers, INVUS  = new List[MAX_USERS], users, userMovies, usersRatingSet, (double)-m/100,n);
             simTime4=startTime-System.currentTimeMillis();
             //System.out.println("aaa");
             //Similarities.Print_Similarities(totalUsers, US);
@@ -392,21 +391,26 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
             Assign_Values(Predictions.Positive_Prediction(totalUsers, totalMovies, US, users, userMovies, p),1);
             predTime1=startTime-System.currentTimeMillis();                          //Time for the calculation of Predicted ratings 
 
-            startTime=System.currentTimeMillis();                    //New Timer
-            Assign_Values(Predictions.Compute_Prediction(totalUsers, totalMovies, RUS, users, userMovies, 1, p),2);            
-            predTime2=startTime-System.currentTimeMillis();                          //Time for the calculation of Predicted ratings         
+//            startTime=System.currentTimeMillis();                    //New Timer
+//            Assign_Values(Predictions.Compute_Prediction(totalUsers, totalMovies, RUS, users, userMovies, 1, p),2);            
+//            predTime2=startTime-System.currentTimeMillis();                          //Time for the calculation of Predicted ratings         
 
             startTime=System.currentTimeMillis();                    //New Timer
-            Assign_Values(Predictions.Compute_Prediction(totalUsers, totalMovies, NO3RUS, users, userMovies, 2, p),3);                 
+            Assign_Values(Predictions.Negative_Prediction(totalUsers, totalMovies, RUS, users, userMovies, p),2);            
+            predTime2=startTime-System.currentTimeMillis();                          //Time for the calculation of Predicted ratings    
+            
+            startTime=System.currentTimeMillis();                    //New Timer
+            Assign_Values(Predictions.Negative_Prediction(totalUsers, totalMovies, NO3RUS, users, userMovies, p),3);                 
             predTime3=startTime-System.currentTimeMillis();                          //Time for the calculation of Predicted ratings         
 
             startTime=System.currentTimeMillis();                    //New Timer
             Assign_Values(Predictions.Inverted_Prediction(totalUsers, totalMovies, INVUS, users, userMovies, p),4);     
-            System.out.println(negAverMAE+" "+negAverPredictedValues);            
+//            System.out.println(negAverMAE+" "+negAverPredictedValues);            
             predTime4=startTime-System.currentTimeMillis();    
         
             startTime=System.currentTimeMillis();                    //New Timer
             Assign_Values(Predictions.Combined_Prediction(totalUsers, totalMovies, US, INVUS, COMBINE = new List[MAX_USERS], users, userMovies, p),5);
+//            Assign_Values(Predictions.Combined_Prediction(totalUsers, totalMovies, US, RUS, COMBINE = new List[MAX_USERS], users, userMovies, p),5);
             predTime5=startTime-System.currentTimeMillis();                          //Time for the calculation of Predicted ratings 
 
             totalTime=firstTime-System.currentTimeMillis(); 
@@ -415,11 +419,11 @@ try(FileWriter outExcel = new FileWriter( outFileResults )) {
             aa++;    
 
             outExcel.write(aa+"\t"+(double)l/100+"\t\t"+(double)m/100+"\t\t"+(double)m/100+"\t\t\t"+n+"\t\t\t"+p);
-            outExcel.write("\t\t"+positivePredictions+"\t"+(double)positivePredictions/(totalUsers+1)+"\t"+MAE+"\t"+(double)(MAE/positivePredictions));
-            outExcel.write("\t"+revPredictedValues+"\t"+(double)revPredictedValues/(totalUsers+1)+"\t"+RevMAE+"\t"+(double)(RevMAE/revPredictedValues));
-            outExcel.write("\t"+NO3RevPredictedValues+"\t"+(double)NO3RevPredictedValues/(totalUsers+1)+"\t"+NO3RevMAE+"\t"+(double)(NO3RevMAE/NO3RevPredictedValues));
-            outExcel.write("\t"+negAverPredictedValues+"\t"+(double)negAverPredictedValues/(totalUsers+1)+"\t"+negAverMAE+"\t"+(double)(negAverMAE/negAverPredictedValues));            
-            outExcel.write("\t"+combinedPredictions+"\t"+(double)combinedPredictions/(totalUsers+1)+"\t"+combinedMAE+"\t"+(double)(combinedMAE/combinedPredictions));
+            outExcel.write("\t\t\t"+positivePredictions+"\t\t\t"+(double)positivePredictions/(totalUsers+1)+"\t"+MAE+"\t\t"+(double)(MAE/positivePredictions));
+            outExcel.write("\t"+revPredictedValues+"\t\t"+(double)revPredictedValues/(totalUsers+1)+"\t"+RevMAE+"\t\t"+(double)(RevMAE/revPredictedValues));
+            outExcel.write("\t"+NO3RevPredictedValues+"\t\t\t"+(double)NO3RevPredictedValues/(totalUsers+1)+"\t"+NO3RevMAE+"\t\t"+(double)(NO3RevMAE/NO3RevPredictedValues));
+            outExcel.write("\t"+negAverPredictedValues+"\t\t\t"+(double)negAverPredictedValues/(totalUsers+1)+"\t"+negAverMAE+"\t\t"+(double)(negAverMAE/negAverPredictedValues));            
+            outExcel.write("\t"+combinedPredictions+"\t\t\t\t"+(double)combinedPredictions/(totalUsers+1)+"\t"+combinedMAE+"\t\t"+(double)(combinedMAE/combinedPredictions));
             outExcel.write("\r\n"); 
 
             //  Print Statistics

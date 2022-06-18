@@ -14,12 +14,12 @@ public class Global_Vars {
 static final int NO_PREDICTION=-10;    //"Prediction value" for items that cannot be predicted
 static final int MAX_RATING=5;
 
-static final int SIMILARITY_BASE_LIMIT=0;   //Compute Similarity: Greater/Lesser or equal than .. (>= or <=)
-static final int SIMILARITY_UPPER_LIMIT=100;
-static final int NEGATIVE_SIMILARITY_BASE_LIMIT=-100;         //FOR SIMPLE CALC BEST 20
-static final int NEGATIVE_SIMILARITY_UPPER_LIMIT=0;
-static final int NO3_NEGATIVE_SIMILARITY_BASE_LIMIT=-100;
-static final int NO3_NEGATIVE_SIMILARITY_UPPER_LIMIT=0;   
+static final int SIMILARITY_BASE_LIMIT=20;   //Compute Similarity: Greater/Lesser or equal than .. (>= or <=)
+static final int SIMILARITY_UPPER_LIMIT=40;
+static final int NEGATIVE_SIMILARITY_BASE_LIMIT=-40;         //FOR SIMPLE CALC BEST 20
+static final int NEGATIVE_SIMILARITY_UPPER_LIMIT=-20;
+static final int NO3_NEGATIVE_SIMILARITY_BASE_LIMIT=-40;
+static final int NO3_NEGATIVE_SIMILARITY_UPPER_LIMIT=-20;   
 
 static final int MIN_COMMON_MOVIES=0;       //Compute Similarity: Greater than .. (>)
 static final int MAX_COMMON_MOVIES=0;

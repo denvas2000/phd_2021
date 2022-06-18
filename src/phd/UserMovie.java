@@ -21,6 +21,23 @@ public double negWeight; //NOT NEEDED
 public int Time_Stamp;
 public double Weight;
 
+int Inverse_Rating (int rating)
+{
+int inverted_rating;
+    
+inverted_rating=rating;
+
+switch(rating) {
+case 1:inverted_rating=5;break;
+case 2:inverted_rating=4;break;
+case 3:inverted_rating=3;break;
+case 4:inverted_rating=2;break;
+case 5:inverted_rating=1;break;
+}
+
+return inverted_rating;    
+}
+
 
 //class constructor;
 public UserMovie (int user, int movie, int rating, int timestamp, double weight) {
@@ -28,8 +45,10 @@ public UserMovie (int user, int movie, int rating, int timestamp, double weight)
    User_Id=user;
    Movie_Id=movie;
    Rating=rating;
+//   invRating=Inverse_Rating(rating);
    Time_Stamp=timestamp;
    Weight=weight;
+   
    if (Global_Vars.NEG_WEIGHT_TYPE==1) //NOT NEEDED
    switch(rating) {
        case 1: negWeight=0.5;break;

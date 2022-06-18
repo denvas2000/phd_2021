@@ -25,7 +25,7 @@ public class Parallel_Sim implements Runnable{
  User[] users;
  HashMap<CellCoor,UserMovie> userMovies;
  HashSet<Integer>[] usersRatingSet;
- int similaritySign;
+// int similaritySign;
  double simBase;
  int commonMovies;
 
@@ -38,7 +38,6 @@ List<UserSimilarity>[] userSim,
 User[] users,
 HashMap<CellCoor,UserMovie> userMovies,
 HashSet<Integer>[] usersRatingSet,
-int similaritySign,
 double simBase,
 int commonMovies) {
 
@@ -50,7 +49,6 @@ this.userSim=userSim;
 this.users=users;
 this.userMovies=userMovies;
 this.usersRatingSet=usersRatingSet;
-this.similaritySign=similaritySign;
 this.simBase=simBase;
 this.commonMovies=commonMovies;
 } //Constructor Parallel_Sim
@@ -64,11 +62,18 @@ switch(option) {
 totalUsers, userSim, users, userMovies, usersRatingSet, simBase,
 commonMovies);
             break;
-    case 2: Similarities.Compute_Similarity_Parallel(low,upper,
+    case 2: Similarities.Negative_Similarity_Parallel(low,upper,
 totalUsers, userSim, users, userMovies, usersRatingSet,
-similaritySign, simBase, commonMovies);
+simBase, commonMovies);
             break;
-    case 3: Similarities.Inverted_Similarity_Parallel(low,upper,
+    case 3: Similarities.Negative_NO3_Similarity_Parallel(low,upper,
+totalUsers, userSim, users, userMovies, usersRatingSet,
+simBase, commonMovies);    
+//    case 3: Similarities.Compute_Similarity_Parallel(low,upper,
+//totalUsers, userSim, users, userMovies, usersRatingSet,
+//2, simBase, commonMovies);
+            break;
+    case 4: Similarities.Inverted_Similarity_Parallel(low,upper,
 totalUsers, userSim, users, userMovies, usersRatingSet, simBase,
 commonMovies);          //Set new timer
             break;

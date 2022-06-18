@@ -16,14 +16,14 @@ public class User {
 public int UserId;            //Define Member Variables
 public int lastMovieId;
 public int ratingSum;
-public int invRatingSum;
 public int ratingNum;
 public int NO3RatingSum;
 public int NO3RatingNum;
 public int MinTimeStamp;
 public int MaxTimeStamp;
-public int maxRating;
 public int minRating;
+public int maxRating;
+public int invRatingSum;
 public int Prediction;
 public int RevPrediction;
 public int NO3RevPrediction;
@@ -124,7 +124,7 @@ public double UserAverageRate () {
 public double UserInvertedAverageRating () {
     
     return (double)invRatingSum/(double)ratingNum;
-    
+//    return (double)6-UserAverageRate();
 }
 } //end User class definition
  

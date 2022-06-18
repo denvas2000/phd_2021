@@ -20,7 +20,7 @@ public Double Similarity;               //Similarity (positive/negative) of the 
                                         //It has to be Double (object) so as to settle compareTo method
 public double combinedSimilarity;       //Similarity (abs measure) of the two users
                                         //DOES IT NEED TO BE Double?
-public int flag;
+public int flag;                        //If 1 then Positive Similarity. If 0 Negative similarity
 
 
 

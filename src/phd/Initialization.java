@@ -31,9 +31,18 @@ Inverts the ratings. If the (abs)difference is more than 0.5 special treatment i
     
 */    
 public static int New_Rating (int tempRating, double diff) {
-int newRating;
+int newRating=0;
 
-newRating=tempRating;
+//newRating=tempRating;
+
+//    switch(tempRating) {
+//    case 1:newRating=5;break;
+//    case 2:newRating=4;break;
+//    case 3:newRating=3;break;
+//    case 4:newRating=2;break;
+//    case 5:newRating=1;break;
+//    default: newRating=tempRating;
+//    }
 
 if (Math.abs(diff)<=0.5)    
     switch(tempRating) {
@@ -64,7 +73,8 @@ if (diff>0.5)
     
 return newRating;    
 }
-    
+
+/*
 public static void Compute_Inverse_Data(
 int totalUsers, 
 int totalMovies,
@@ -107,7 +117,7 @@ for (i=0;i<=totalUsers;i++)
 
 } //END of class Compute_Inverse_Data
 //
-
+*/
 public static void Compute_Inverse(
 int totalUsers, 
 int totalMovies,
@@ -116,7 +126,7 @@ HashMap<CellCoor,UserMovie>  userMovies) {
 
 int i, j;
 int tempRating;
-int tempInvRating;
+int tempInvRating, a1;
 int[] tempSum = new int[totalUsers+1];
 double[] tempAverage = new double[totalUsers+1];      
 double diff;        //Deviation from mean value (3)
@@ -145,9 +155,19 @@ for(CellCoor key: keys) {
     tempRating=tempUserMovie.getRating();
     diff=tempAverage[user]-3;
     tempInvRating=New_Rating(tempRating,diff);
+    a1=tempUserMovie.invRating;
+    if (tempUserMovie.invRating!=tempInvRating)
+    {
+//    System.out.println("user id:"+user+", movie id:"+movie+", tempRating:"+tempRating+", invRating:"+tempInvRating+", ObjectInvRating:"+userMovies.get(key).invRating);    
+    }
+
     tempSum[user]+=tempInvRating;
     tempUserMovie.invRating=tempInvRating;
-    //if (user==22) System.out.println("user id:"+user+", movie id:"+movie+", tempRating:"+tempRating+", invRating:"+tempInvRating+", ObjectInvRating:"+userMovies.get(key).invRating);
+//    if (user==22) System.out.println("user id:"+user+", movie id:"+movie+", tempRating:"+tempRating+", invRating:"+tempInvRating+", ObjectInvRating:"+userMovies.get(key).invRating);
+    if (a1!=tempUserMovie.invRating)
+    {
+//    System.out.println("user id:"+user+", movie id:"+movie+", tempRating:"+tempRating+", invRating:"+tempInvRating+", ObjectInvRating:"+userMovies.get(key).invRating);    
+    }
 }
 
 for (i=0;i<=totalUsers;i++)

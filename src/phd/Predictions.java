@@ -90,6 +90,7 @@ for (i=0;i<=totalUsers;i++)
                 Numerator_Pred += io.Similarity*(userMovies.get(cell).getRating()-Users[io.SUser_Id].UserAverageRate());
                         
             }//if
+
         }//for
     }//if
     
@@ -149,6 +150,77 @@ for (i=0;i<=totalUsers;i++)
 return new double[] {simNeighbors, revSimNeighbors, NO3RevSimNeighbors, predictedValues, revPredictedValues, NO3RevPredictedValues, MAE, RevMAE, NO3RevMAE};
 
 } //END OF METHOD Compute_Prediction 
+
+public static double[] Negative_Prediction (
+int totalUsers, 
+int totalMovies,
+List<UserSimilarity>[] userSim,
+User[] Users,
+HashMap<CellCoor,UserMovie>  userMovies,
+int bestNeigh)
+
+{
+
+int i, k, l;    
+int revSimNeighbors=0;
+List<UserSimilarity> UserList = new ArrayList<>();
+double Numerator_Pred, Denominator_Pred;            //Numerator and Denominator of Prediction function.
+int revPredictedValues=0;        //The total number of actually predicted values
+double RevMAE=0.0;                         //Mean Absolute Error of Prediction.
+int minSimNeigh=0;
+CellCoor cell = new CellCoor();
+
+for (i=0;i<=totalUsers;i++) 
+{
+
+    UserList=userSim[i];
+    
+    Numerator_Pred=0;Denominator_Pred=0;
+    k=Users[i].lastMovieId;
+            
+    //if (!UserList.isEmpty()) 
+    if (UserList.size()>minSimNeigh) 
+    {   
+        if (bestNeigh<userSim[i].size())
+            UserList=userSim[i].subList(0, bestNeigh-1);
+        revSimNeighbors++;
+
+        for (UserSimilarity io: UserList)
+        {
+            cell.user=io.SUser_Id;cell.movie=k;        
+            if (userMovies.get(cell)!=null)
+            {  
+                Denominator_Pred += Math.abs((io.Similarity));
+                Numerator_Pred += io.Similarity*(userMovies.get(cell).getRating()-Users[io.SUser_Id].UserAverageRate());
+                        
+            }//if
+        }//for
+    }//if
+    
+    if (Denominator_Pred==0)                                            //Special Condition. When there are no NN that rated LastMovie or
+        Users[i].setRevPrediction(Global_Vars.NO_PREDICTION);
+    else    
+    {
+        Users[i].setRevPrediction((int)Math.round(Users[i].UserAverageRate()+Numerator_Pred/Denominator_Pred));  //Normal Condition. When there are FN that rated LastMovie
+                   
+        if (Users[i].getRevPrediction()>5) 
+            Users[i].setRevPrediction(5);
+        else
+            if ((Users[i].getRevPrediction()<1) && (Users[i].getRevPrediction()!=Global_Vars.NO_PREDICTION)) 
+                Users[i].setRevPrediction(1);          
+
+        cell.user=i;cell.movie=k;              
+        RevMAE += Math.abs(Users[i].getRevPrediction()-userMovies.get(cell).getRating());
+        revPredictedValues++;
+    
+    }//if (Denominator_Pred==0)
+            
+    UserList=new ArrayList<>();
+    
+}//for    
+return new double[] {revSimNeighbors, revPredictedValues, RevMAE};
+
+} //END OF METHOD Negative_Prediction 
 
 /*
 Function POSITIVE PREDICTION
@@ -269,7 +341,7 @@ List<UserSimilarity>[] negSim,                      //FN Similarity list of a us
 List<UserSimilarity>[] comSim,                      //COMBINED Similarity list of a user. May contain DUPLICATES
 User[] Users,
 HashMap<CellCoor,UserMovie>  userMovies,
-int bestNeigh)                                      //Select just the "bestNeigh" (absolute number of most similar heighbors)
+int bestNeigh)                                      //Select just the "bestNeigh" Neighbors (absolute number of most similar heighbors)
 
 {
 
@@ -293,7 +365,7 @@ Integer curUser;                                    //User under manipulation
 Iterator<UserSimilarity> itr;
 UserSimilarity tempSim =new UserSimilarity();
 int temp=0, pos=0, neg=0;
-int minSimNeigh=0;
+int minSimNeigh=0;                                  //Minimum Required Neighbours
 CellCoor cell = new CellCoor();
 //CellCoor cell1 = new CellCoor();
 
@@ -341,7 +413,7 @@ for (i=0;i<=totalUsers;i++)
             //System.out.print(" "+curUser);
             
             //If user has already been included then remove from initial list, otherwise add the user
-            if (usersSet.contains(curUser)) { //System.out.println(" Remove* "+curUser+" * "); 
+            if (usersSet.contains(curUser)) { System.out.println(" Remove* Start User: "+i+" Similar User: "+curUser+" * "); 
                 itr.remove();}
             else{//System.out.println(" Add* "+curUser+" * ");
                 usersSet.add(curUser);}
@@ -360,7 +432,8 @@ for (i=0;i<=totalUsers;i++)
     Numerator_Pred=0;Denominator_Pred=0;
     k=Users[i].lastMovieId;            
             
-    if (combinedList.size()>minSimNeigh) //Does the User have at least the minimum number Neighbours?
+    if (combinedList.size()>minSimNeigh) //Does the User have at least the minimum required number of Neighbours? Maybe not necessary as 
+                                         //next if may solve the problem
     {   
         if (bestNeigh<combinedList.size())                      //Select just the "bestNeigh" best neighbors. If total neighbors less than
             combinedList=combinedList.subList(0, bestNeigh-1);  //n=bestNeigh then select them all.
@@ -377,7 +450,7 @@ for (i=0;i<=totalUsers;i++)
             {  
                 if (io.flag==1) pos++; else neg++;
                 Denominator_Pred += io.GetCombinedSimilarity();
-                Numerator_Pred += io.GetCombinedSimilarity()*(userMovies.get(cell).getRating()-Users[io.SUser_Id].UserAverageRate());
+                Numerator_Pred += io.GetCombinedSimilarity()*(userMovies.get(cell).Rating -Users[io.SUser_Id].UserAverageRate());
                         
             }// if userMovies
         }// for UserSimilarity
